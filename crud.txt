@@ -1,0 +1,82 @@
+Imports System.Data.OleDb
+
+Public Class _Default
+    Inherits System.Web.UI.Page
+
+    Dim cn As New OleDbConnection
+    Dim cmd As OleDbCommand
+    Dim dr As OleDbDataReader
+    Dim adp As New OleDbDataAdapter
+    Dim ds As New DataSet
+    Public Sub display()
+        ds.Clear()
+        adp = New OleDbDataAdapter("select * from  crud", cn)
+        adp.Fill(ds)
+        GridView1.DataSource = ds.Tables(0)
+        GridView1.DataBind()
+
+    End Sub
+
+    Protected Sub Page_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
+        cn.ConnectionString = "Provider=Microsoft.ACE.OLEDB.12.0;Data Source=C:\Users\Rohan\OneDrive\Desktop\crud.accdb"
+        cn.Open()
+        display()
+        cn.Close()
+    End Sub
+
+
+    Protected Sub btnInsert_Click(ByVal sender As Object, ByVal e As EventArgs) Handles btnInsert.Click
+        Try
+            cn.Open()
+            cmd = New OleDbCommand("insert into crud values(" & rollno.Text & ",'" & name.Text & "'," & semester.Text & ") ", cn)
+            cmd.ExecuteNonQuery()
+            MsgBox("Record Inserted")
+            display()
+        Catch ex As Exception
+            MsgBox("Insert Details")
+        End Try
+        cn.Close()
+    End Sub
+
+    Protected Sub btnUpdate_Click(ByVal sender As Object, ByVal e As EventArgs) Handles btnUpdate.Click
+        Try
+            cn.Open()
+            cmd = New OleDbCommand("update crud set name='" & name.Text & "' , semester=" & semester.Text & " where rollno=" & rollno.Text & "", cn)
+            cmd.ExecuteNonQuery()
+            MsgBox("Record Updated")
+            display()
+        Catch ex As Exception
+            MsgBox("Update Details")
+        End Try
+        cn.Close()
+    End Sub
+
+    Protected Sub btnDelete_Click(ByVal sender As Object, ByVal e As EventArgs) Handles btnDelete.Click
+        Try
+            cn.Open()
+            cmd = New OleDbCommand("delete from crud where rollno=" & rollno.Text & "", cn)
+            cmd.ExecuteNonQuery()
+            MsgBox("Record Deleted")
+            display()
+        Catch ex As Exception
+            MsgBox("Delete Details")
+        End Try
+        cn.Close()
+    End Sub
+
+    Protected Sub btnSearch_Click(ByVal sender As Object, ByVal e As EventArgs) Handles btnSearch.Click
+        Try
+            cn.Open()
+            cmd = New OleDbCommand("select * from crud where rollno=" & rollno.Text & "", cn)
+            dr = cmd.ExecuteReader()
+            While dr.Read()
+                name.Text = dr.Item(1)
+                semester.Text = dr.Item(2)
+            End While
+        Catch ex As Exception
+            MsgBox(ex.ToString, , "Record Not Found")
+        End Try
+        cn.Close()
+
+    End Sub
+End Class
